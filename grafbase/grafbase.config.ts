@@ -57,7 +57,7 @@ const User = g.model('User',{
     avatarUrl : g.url(),
     description : g.string().optional(), 
     githubUrl : g.url().optional(),
-    linkedinUrl : g.url().optional(),
+    linkedingUrl : g.url().optional(),
     projects : g.relation(()=>Project).list().optional(),
 }).auth((rules)=>{
   rules.public().read()

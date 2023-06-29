@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
     },
     decode: async ({ secret, token }) => {
       const decodedToken = jsonwebtoken.verify(token!, secret);
-      console.log(decodedToken)
+     // console.log('DECODED TOKEN :',decodedToken)
       return decodedToken as JWT;
     },
   },
@@ -40,41 +40,39 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async session({ session }) {
-      // console.log('SESSOIN',session)
+     // console.log(session)
+      const email = session?.user?.email as string;
 
-      const email = session?.user?.email as string
-      try {
-        const data = await getUser(email) as {user?:UserProfile}
-        console.log(data)
-        const newsession = {...session , user : {
+      try { 
+      //  console.log("EMAIL IN session",email)
+        const data = await getUser(email) as { user?: UserProfile }
+       // console.log(data)
+        const newSession = {
+          ...session,
+          user: {
             ...session.user,
-            ...data?.user
-        }}
-        console.log(newsession)
-      return newsession;
-      } catch (error) {
-        console.log('error in session ',error)
+            ...data?.user,
+          },
+        };
+        //console.log('New SESSION : ',newSession)
+        return newSession;
+      } catch (error: any) {
+        console.error("Error retrieving user data: ", error.message);
+        console.log('SESSION',session)
+        return session;
       }
-      return session;
     },
     async signIn({ user }: { user: AdapterUser | User }) {
       try {
-        //get user if exist
-        const userExists = (await getUser(user?.email as string)) as {
-          user?: UserProfile;
-        };
-        console.log(userExists)
-        //else create them
-        if (!userExists) {
-          await createUser(
-            user.name as string,
-            user.email as string,
-            user.image as string
-          );
+        const userExists = await getUser(user?.email as string) as { user?: UserProfile }
+        
+        if (!userExists.user) {
+          await createUser(user.name as string, user.email as string, user.image as string)
         }
+
         return true;
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.log("Error checking if user exists: ", error.message);
         return false;
       }
     },
