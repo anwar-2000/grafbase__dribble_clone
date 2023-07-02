@@ -1,15 +1,57 @@
-import React from 'react'
+import { ProjectInterface } from "@/common.types";
+import ProjectCard from "@/components/ProjectCard";
+import { fetchProjects } from "@/lib/actions";
+import React from "react";
 
-interface Props {}
+type ProjectsSearch = {
+  projectsSearch: {
+    edges: {
+      node: ProjectInterface;
+    }[];
+    pageInfo: {
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
+  };
+};
 
-const Home = () => {
-  return <section className='flex-start flex-col paddings mb-16'>
-    <h1>categories</h1>
-    
-    <h1>posts</h1>
+const Home = async () => {
+  const data = (await fetchProjects()) as ProjectsSearch;
+  const projectsToDisplay = data?.projectsSearch?.edges || [];
 
-    <h1>LoadMore</h1>
-  </section>
-}
+  if (projectsToDisplay.length === 0) {
+    return (
+      <section className="flexstart flex-col paddings">
+        categories
+        <p className="no-result-text text-center">
+          No Projects Found - create some
+        </p>
+      </section>
+    );
+  }
+  return (
+    <section className="flex-start flex-col paddings mb-16">
+      <h1>categories</h1>
 
-export default Home
+      <section className="projects-grid">
+        {projectsToDisplay.map(({ node }: { node: ProjectInterface }) => (
+          <ProjectCard key={node?.id}
+           id={node?.id}
+           image = {node?.image} 
+           title = {node?.title}
+           name = {node?.createdBy?.name}
+           avatarUrl = {node?.createdBy?.avatarUrl}
+           userId = {node?.createdBy?.id}
+           />
+           
+        ))}
+      </section>
+
+      <h1>LoadMore</h1>
+    </section>
+  );
+};
+
+export default Home;
