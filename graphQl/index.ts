@@ -15,7 +15,7 @@ export const createProjectMutation = `
 `;
 
 export const updateProjectMutation = `
-	mutation UpdateProject($id: ID!, $input: ProjectsUpdateInput!) {
+	mutation UpdateProjects($id: ID!, $input: ProjectsUpdateInput!) {
 		projectsUpdate(by: { id: $id }, input: $input) {
 			project {
 				id
@@ -31,7 +31,7 @@ export const updateProjectMutation = `
 `;
 
 export const deleteProjectMutation = `
-  mutation DeleteProject($id: ID!) {
+  mutation DeleteProjects($id: ID!) {
     projectsDelete(by: { id: $id }) {
       deletedId
     }
@@ -85,7 +85,7 @@ export const projectsQuery = `
 `;
 
 export const getProjectByIdQuery = `
-  query GetProjectById($id: ID!) {
+  query GetProjectsById($id: ID!) {
     projects(by: { id: $id }) {
       id
       title
@@ -93,7 +93,7 @@ export const getProjectByIdQuery = `
       image
       liveProjectUrl
       githubUrl
-      category
+      catgeory
       createdBy {
         id
         name
@@ -127,7 +127,7 @@ export const getProjectsOfUserQuery = `
       description
       avatarUrl
       githubUrl
-      linkedinUrl
+      linkedingUrl
       projects(last: $last) {
         edges {
           node {

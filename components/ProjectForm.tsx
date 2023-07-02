@@ -1,31 +1,31 @@
 "use client"
 
-
-import { SessionInterface } from "@/common.types";
+import { FormState, ProjectInterface, SessionInterface } from "@/common.types";
 import React, { ChangeEvent, useState } from "react";
 import Image from "next/image";
 import FormField from "./FormField";
 import { categoryFilters } from "@/constants";
 import CustomMenu from "./CustomMenu";
 import Button from "./Button";
-import { createProject, fetchToken } from "@/lib/actions";
+import { createProject, fetchToken, updateProject } from "@/lib/actions";
 import { useRouter } from "next/navigation";
 type Props = {
   type: string;
   session: SessionInterface;
+  project : ProjectInterface
 };
 
-const ProjectForm: React.FC<Props> = ({ type, session }) => {
+const ProjectForm: React.FC<Props> = ({ type, session , project}) => {
   const router = useRouter()
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    image: "",
-    title: "",
-    description: "",
-    githubUrl: "",
-    liveProjectUrl: "",
-    catgeory: "",
-  });
+  const [form, setForm] = useState<FormState>({
+    title: project?.title || "",
+    description: project?.description || "",
+    image: project?.image || "",
+    liveProjectUrl: project?.liveProjectUrl || "",
+    githubUrl: project?.githubUrl || "",
+    catgeory: project?.catgeory || ""
+})
 
   const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -40,6 +40,11 @@ const ProjectForm: React.FC<Props> = ({ type, session }) => {
             console.log(response)
             if (response) router.push('/')
           }
+          if (type === "edit") {
+            await updateProject(form, project?.id as string, token)
+
+            router.push("/")
+        }
         } catch (error) {
           console.log(error)
         }finally{
@@ -119,7 +124,7 @@ const ProjectForm: React.FC<Props> = ({ type, session }) => {
       <FormField
         type="url"
         title="website URL"
-        state={form.liveProjectUrl}
+        state={form.liveProjectUrl as string}
         placeholder="https://...."
         setState={(value) => handleStateChange("liveProjectUrl", value)}
       />
